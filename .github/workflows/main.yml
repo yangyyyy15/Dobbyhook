@@ -1,0 +1,23 @@
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Android NDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r25b
+        
+    - name: Compile Dobby for Android
+      run: |
+        mkdir -p build/android
+        python3 scripts/platform_builder.py --platform=android --arch=all --cmake_dir=$CMAKE_VERSION --llvm_dir=$LLVM_VERSION --android_ndk_dir=$ANDROID_NDK_HOME
+        cp include/dobby.h build/android
+        cp build/android/libdobby.so build/android/
+        
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libdobby-android
+        path: build/android/libdobby.so
